@@ -1,182 +1,238 @@
-import express from "express";
-import bodyParser from "body-parser";
-import pg from "pg";
+/*!
+ * accepts
+ * Copyright(c) 2014 Jonathan Ong
+ * Copyright(c) 2015 Douglas Christopher Wilson
+ * MIT Licensed
+ */
 
-const app = express();
-const port = 3000;
+'use strict'
 
-const db = new pg.Client({
-    user: 'postgres',
-    host: 'localhost',
-    database: 'BlogDB',
-    password: 'vander2003',
-    port: 5432,
-});
+/**
+ * Module dependencies.
+ * @private
+ */
 
-db.connect();
+var Negotiator = require('negotiator')
+var mime = require('mime-types')
 
-// variable to store blogs
-let blogs = [];
-let currentUser = null;
+/**
+ * Module exports.
+ * @public
+ */
 
-// Set up view engine and static files
-app.set('view engine', 'ejs');
+module.exports = Accepts
 
-// get it so the static objects can use css
-app.use(express.static("public"));
+/**
+ * Create a new Accepts object for the given req.
+ *
+ * @param {object} req
+ * @public
+ */
 
-// parse incoming data 
-app.use(bodyParser.urlencoded({ extended: true }));
+function Accepts (req) {
+  if (!(this instanceof Accepts)) {
+    return new Accepts(req)
+  }
 
-// renders the main home page 
-app.get("/", async(req, res) => {
-    if(currentUser === null)
-    {
-        res.render("signin", { error: null });
-    } 
-    else 
-    {
-        const result = await db.query('SELECT * FROM blogs ORDER BY date_created DESC');
-        res.render("index.ejs", {
-            blogs: result.rows,
-            currentUser: currentUser
-        });
-    }   
-});
+  this.headers = req.headers
+  this.negotiator = new Negotiator(req)
+}
 
-// Renders the signup page
-app.get("/signup", (req, res) => {
-    res.render("signup", { error: null });
-});
+/**
+ * Check if the given `type(s)` is acceptable, returning
+ * the best match when true, otherwise `undefined`, in which
+ * case you should respond with 406 "Not Acceptable".
+ *
+ * The `type` value may be a single mime type string
+ * such as "application/json", the extension name
+ * such as "json" or an array `["json", "html", "text/plain"]`. When a list
+ * or array is given the _best_ match, if any is returned.
+ *
+ * Examples:
+ *
+ *     // Accept: text/html
+ *     this.types('html');
+ *     // => "html"
+ *
+ *     // Accept: text/*, application/json
+ *     this.types('html');
+ *     // => "html"
+ *     this.types('text/html');
+ *     // => "text/html"
+ *     this.types('json', 'text');
+ *     // => "json"
+ *     this.types('application/json');
+ *     // => "application/json"
+ *
+ *     // Accept: text/*, application/json
+ *     this.types('image/png');
+ *     this.types('png');
+ *     // => undefined
+ *
+ *     // Accept: text/*;q=.5, application/json
+ *     this.types(['html', 'json']);
+ *     this.types('html', 'json');
+ *     // => "json"
+ *
+ * @param {String|Array} types...
+ * @return {String|Array|Boolean}
+ * @public
+ */
 
-// Handle signup form submission
-app.post("/signup", async (req, res) => {
-    const { password, name } = req.body;
+Accepts.prototype.type =
+Accepts.prototype.types = function (types_) {
+  var types = types_
 
-    const userPassword = String(password);
-    const userName = String(name);
-
-    const result = await db.query('SELECT * FROM users WHERE name = $1', [name]);
-
-    // check for user already taken
-    if (result.rowCount > 0) {
-        // Username is already taken
-        return res.render("signup", { error: 'Username is already taken. Please choose a different one.' });
+  // support flattened arguments
+  if (types && !Array.isArray(types)) {
+    types = new Array(arguments.length)
+    for (var i = 0; i < types.length; i++) {
+      types[i] = arguments[i]
     }
+  }
 
-    // if client info is fine send to datbase 
-    await db.query('INSERT INTO users (password, name) VALUES ($1, $2)', [userPassword, userName]);
+  // no types, return all requested types
+  if (!types || types.length === 0) {
+    return this.negotiator.mediaTypes()
+  }
 
-    // redirect to signin page to use new login we created 
-    res.redirect('/signin');
-});
+  // no accept header, return first given type
+  if (!this.headers.accept) {
+    return types[0]
+  }
 
-// Renders the signin page
-app.get("/signin", (req, res) => {
-    res.render("signin", { error: null });
-});
+  var mimes = types.map(extToMime)
+  var accepts = this.negotiator.mediaTypes(mimes.filter(validMime))
+  var first = accepts[0]
 
-// Handle signin form submission
-app.post("/signin", async (req, res) => {
-    const { name, password } = req.body;
+  return first
+    ? types[mimes.indexOf(first)]
+    : false
+}
 
-    const userPassword = String(password);
-    const userName = String(name);
+/**
+ * Return accepted encodings or best fit based on `encodings`.
+ *
+ * Given `Accept-Encoding: gzip, deflate`
+ * an array sorted by quality is returned:
+ *
+ *     ['gzip', 'deflate']
+ *
+ * @param {String|Array} encodings...
+ * @return {String|Array}
+ * @public
+ */
 
-    const result = await db.query('SELECT * FROM users WHERE name = $1 AND password = $2', [userName, userPassword]);
+Accepts.prototype.encoding =
+Accepts.prototype.encodings = function (encodings_) {
+  var encodings = encodings_
 
-    // check for invalid log in
-    if (result.rows.length === 0) {
-        return res.render("signin", { error: 'Invalid User ID or Password. Please try again.' });
+  // support flattened arguments
+  if (encodings && !Array.isArray(encodings)) {
+    encodings = new Array(arguments.length)
+    for (var i = 0; i < encodings.length; i++) {
+      encodings[i] = arguments[i]
     }
+  }
 
-    // Successful login
-    currentUser = {
-        id: result.rows[0].user_id,
-        name: result.rows[0].name,
-    };
+  // no encodings, return all requested encodings
+  if (!encodings || encodings.length === 0) {
+    return this.negotiator.encodings()
+  }
 
-    // successful login redirect to main page
-    res.redirect("/");
-});
+  return this.negotiator.encodings(encodings)[0] || false
+}
 
-// renders the home page after updating blogs with the new blog data
-// uses .toLocaleString() to help make data format look better 
-app.post("/submit", async (req, res) => {
-    const blog = {
-        creator_name: String(currentUser.name),
-        creator_user_id: currentUser.id, 
-        title: String(req.body.blog_title), 
-        body: String(req.body.blog), 
-        date: String(new Date().toLocaleString())
-    };
+/**
+ * Return accepted charsets or best fit based on `charsets`.
+ *
+ * Given `Accept-Charset: utf-8, iso-8859-1;q=0.2, utf-7;q=0.5`
+ * an array sorted by quality is returned:
+ *
+ *     ['utf-8', 'utf-7', 'iso-8859-1']
+ *
+ * @param {String|Array} charsets...
+ * @return {String|Array}
+ * @public
+ */
 
-    console.log(blog);
+Accepts.prototype.charset =
+Accepts.prototype.charsets = function (charsets_) {
+  var charsets = charsets_
 
-    // Using new Date() to get the current timestamp
-    await db.query('INSERT INTO blogs (creator_name, creator_user_id, title, body, date_created) VALUES ($1, $2, $3, $4, $5)',
-        [blog.creator_name, blog.creator_user_id, blog.title, blog.body, blog.date]
-    );
-
-    res.redirect("/");
-});
-
-// Deletes the blog at index returned and fills gap wih function (splice)
-app.post("/delete", async (req, res) => {
-    // get blog ID
-    const blogId = req.body.blog_id;
-
-    // fetch user data for author of blog
-    const result = await db.query('SELECT * FROM blogs WHERE blog_id = $1', [blogId]);
-
-    // check to make sure user is authorized to delete
-    if (result.rows[0].creator_user_id === currentUser.id) {
-        await db.query('DELETE FROM blogs WHERE blog_id = $1', [blogId]);
+  // support flattened arguments
+  if (charsets && !Array.isArray(charsets)) {
+    charsets = new Array(arguments.length)
+    for (var i = 0; i < charsets.length; i++) {
+      charsets[i] = arguments[i]
     }
+  }
 
-    // Redirect to reload blogs
-    res.redirect("/")
-});
+  // no charsets, return all requested charsets
+  if (!charsets || charsets.length === 0) {
+    return this.negotiator.charsets()
+  }
 
-// grab the data at index in blogs to load into the for on edit.ejs and render
-app.get("/edit/:blogId", async (req, res) => {
-    const blogId = req.params.blogId;
+  return this.negotiator.charsets(charsets)[0] || false
+}
 
-    // get data from database for blog id given
-    const result = await db.query('SELECT * FROM blogs WHERE blog_id = $1', [blogId]);
+/**
+ * Return accepted languages or best fit based on `langs`.
+ *
+ * Given `Accept-Language: en;q=0.8, es, pt`
+ * an array sorted by quality is returned:
+ *
+ *     ['es', 'pt', 'en']
+ *
+ * @param {String|Array} langs...
+ * @return {Array|String}
+ * @public
+ */
 
-    // save all data into blog variable to be passed to edit page 
-    const blog = result.rows[0];
+Accepts.prototype.lang =
+Accepts.prototype.langs =
+Accepts.prototype.language =
+Accepts.prototype.languages = function (languages_) {
+  var languages = languages_
 
-    if (blog.creator_user_id === currentUser.id) {
-         // Redirect to Edit if the user is authorized
-        res.render("edit.ejs", { blog: blog, blogId: blogId });
-    } 
-    else {
-         // Redirect to homepage if the user is not authorized
-        res.redirect("/"); 
+  // support flattened arguments
+  if (languages && !Array.isArray(languages)) {
+    languages = new Array(arguments.length)
+    for (var i = 0; i < languages.length; i++) {
+      languages[i] = arguments[i]
     }
-});
+  }
 
-// update the data at index with form data from edit.ejs return to home page 
-app.post("/update/:blogId", async (req,res) => {
-    const blogId = req.params.blogId;
-    const {blog_title, blog } = req.body;
+  // no languages, return all requested languages
+  if (!languages || languages.length === 0) {
+    return this.negotiator.languages()
+  }
 
-    const result = await db.query('SELECT * FROM blogs WHERE blog_id = $1', [blogId]);
+  return this.negotiator.languages(languages)[0] || false
+}
 
-    // if user is allowed to edit update blog post 
-    if (result.rows[0].creator_user_id === currentUser.id) {
-        // UPDATE blog post 
-        await db.query('UPDATE blogs SET title = $1, body = $2, date_created = $3 WHERE blog_id = $4', 
-            [String(blog_title), String(blog), new Date().toLocaleString(), blogId]);
-    }
+/**
+ * Convert extnames to mime.
+ *
+ * @param {String} type
+ * @return {String}
+ * @private
+ */
 
-    // redirect to the homepage
-    res.redirect("/");
-});
+function extToMime (type) {
+  return type.indexOf('/') === -1
+    ? mime.lookup(type)
+    : type
+}
 
-// make web app run on ${port}
-app.listen(port, () => {
-    console.log(`Server running on port ${port}.`)
-});
+/**
+ * Check if mime is valid.
+ *
+ * @param {String} type
+ * @return {String}
+ * @private
+ */
+
+function validMime (type) {
+  return typeof type === 'string'
+}
