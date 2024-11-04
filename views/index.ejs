@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mini Project 3 Ronan Kent</title>
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+    <%- include("partials/header.ejs") %>
+    <div class="imain">
+        <p><b>Blog Overview</b></p>
+        <% if (postedblogs.length === 0) { %>
+            <p>None currently available for reading</p>
+        <% } else { %>
+            <% postedblogs.forEach(post => { %>
+        <div class="content">
+            <p><b><%= post.title %></b></p>
+            <p class="auth">By: <%= post.creator_name %></p>
+            <p>- <%= post.body %></p>
+            <p class="smallt">Posted: <%= post.date_created %></p>
+
+            <div class="editf">
+                <button class="ediB" onclick="document.getElementById('editB<%= post.blog_id %>')
+                    .style.display='block'">Edit Post</button>
+                    <form id="editB<%= post.blog_id %>"action="/edit" method="post" 
+                    style="display: none;">
+                        <input type="hidden" name="id" value="<%= post.blog_id %>">
+                        <div class="editT">
+                            <label for="editT<%= post.blog_id %>">Change Title: </label>
+                            <input id="editT<%= post.blog_id %>" type="text" 
+                            name="blogT" value="<%= post.title %>" class="editt">
+                        </div>
+                        <div class="editN">
+                            <label for="editN<%= post.blog_id %>">Change Name: </label>
+                            <input id="editN<%= post.blog_id %>" type="text" 
+                            name="blogN" value="<%= post.creator_name %>" class="editn">
+                        </div>
+                        <div class="editC">
+                            <label for="editC<%= post.blog_id %>">Change Blog Content: </label>
+                            <textarea id="editC<%= post.blog_id %>" name="blogC" spellcheck="true" class="editc">
+                            <%= post.body %></textarea>
+                        </div>
+                        <input class="scB" type="submit" value="Save Changes">
+                    </form>
+                    <form action="/del" method="post">
+                        <input type="hidden" name="id" value="<%= post.blog_id %>">
+                        <input type="submit" value="Delete Post" class="delB">
+                    </form>
+            </div>
+        </div>
+        <%    }); %>
+        <% }; %>  
+    </div>
+    <%- include("partials/footer.ejs") %>
+</body>
+</html>
