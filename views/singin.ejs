@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog Sign-Up Page</title>
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+    <%- include("partials/header.ejs") %>
+        <div class="ccontent">
+            <h1>Welcome Back!</h1><br>
+        <h2>Sign in:</h2>
+        <form action="/signin" method="post">
+            <input class="namef" name="idi" type="text" placeholder="User ID">
+            <input class="namef" name="passi" type="text" placeholder="Password">
+            <input type="submit" value="Enter" class="postB">
+        </form>
+        <% if (error) { %>
+            <div class="err"><%= error %></div>
+        <% } %>
+        </div>
+
+    <%- include("partials/footer.ejs") %>
+</body>
+</html>
