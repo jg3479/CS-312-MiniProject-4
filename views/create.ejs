@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog Creation Page</title>
+    <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+
+    <%- include("partials/header.ejs") %>
+    <div class="ccontent">
+        <p><b>Create new post:</b></p>
+        <form action="/pblog" method="post">
+            <input class="namef" type="text" name="blogT" placeholder="Title Here!">
+            <input class="titlef" type="text" name="blogN" placeholder="Name Here!">
+            <textarea name="blogC" placeholder="Whatever is on your mind here"
+            spellcheck="true"></textarea>
+            <input type="submit" value="Post Blog" class="postB">
+        </form>
+    </div>
+    <%- include("partials/footer.ejs") %>
+</body>
+</html>
