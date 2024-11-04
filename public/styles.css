@@ -1,0 +1,248 @@
+body {
+    padding: 20px;
+}
+
+div {
+    border: 10px solid snow;
+    padding: 20px;
+    font-family: Arial, Helvetica, sans-serif;
+}
+.top {
+    text-align: center;
+    background-color: snow;
+    border: solid 20px rgb(44, 79, 114);
+    border-radius: 25px;
+    box-shadow: 20px 20px 50px 15px silver inset;
+    text-shadow: 1px 1px 4px rgb(44, 79, 114);
+}
+.nav {
+    text-align: center;
+    background-color: snow;
+    border: solid 15px rgb(44, 79, 114);
+    border-radius: 25px;
+    box-shadow: 20px 20px 50px 15px silver inset;
+    text-shadow: 1px 1px 4px rgb(44, 79, 114);
+    padding: 10px;
+    display: grid;
+    grid-template-areas: 
+    "wn wn"
+    "hp bp";
+    grid-template-columns: 97%;
+    margin-top: 20px;
+}
+.nav .webnav {
+    text-decoration: none;
+    text-align: center;
+    color: rgb(44, 79, 114);
+    padding: 15px;
+    background-color: snow;
+    border-radius: 20px;
+    border: solid silver 5px; 
+    list-style: none;
+    margin-bottom: 10px;
+    display: inline-block;
+    width: 97%;
+}
+.nav li {
+    list-style: none;
+}
+.nav a {
+    text-decoration: none;
+    text-align: center;
+    color: snow;
+    padding: 15px;
+    background-color: rgb(44, 79, 114);
+    border-radius: 20px;
+    border: solid silver 5px; 
+    list-style: none;
+    margin-bottom: 10px;
+    display: inline-block;
+    width: 97%;
+}
+.nav a:hover {
+    text-decoration: none;
+    color: rgb(44, 79, 114);
+    background-color: snow;
+    transition-duration: 1s;
+}
+.nav .home {
+    grid-area: hp;
+}
+.nav .bcreate {
+    grid-area: bp;
+}
+
+.imain {
+    font-size: larger;
+    font-family: Arial, Helvetica, sans-serif;
+    border: solid 10px rgb(44, 79, 114);
+    border-radius: 20px;
+    text-align: center;
+    margin-top: 20px;
+}
+.content {
+    background-color: snow;
+    border: solid 10px silver;
+    border-radius: 25px;
+    box-shadow: 20px 20px 50px 15px silver inset;
+    padding: 20px;
+    margin: 20px 0;
+    font-family: Arial, Helvetica, sans-serif;
+    text-align: left;
+    max-width: 100%;
+    word-wrap: break-word;
+    overflow: hidden;
+}
+.content .auth {
+    font-style: italic;
+    margin-top: 10px;
+}
+.content form {
+    display: flex;
+    justify-content: space-between;
+    margin-top: 20px;
+}
+.content .ediB {
+    background-color: snow;
+    border: silver solid 2px;
+    padding: 5px;
+    border-radius: 5px;
+    height: 50px;
+    width: 100px;
+}
+.content .ediB:hover {
+    background-color: rgb(44, 79, 114);
+    transition-duration: 1s;
+}
+.content .delB {
+    background-color: snow;
+    border: silver solid 2px;
+    padding: 5px;
+    border-radius: 5px;
+    height: 50px;
+    width: 100px;
+}
+.content .delB:hover {
+    background-color: rgb(44, 79, 114);
+    transition-duration: 1s;
+}
+.content .postB {
+    background-color: snow;
+    border: silver solid 2px;
+    padding: 5px;
+    border-radius: 5px;
+}
+.content .postB:hover {
+    background-color: rgb(44, 79, 114);
+    transition-duration: 1s;
+}
+textarea {
+    width: 100%;
+    border: solid rgb(44, 79, 114) 5px;
+    border-radius: 10px;
+    height: 200px;
+    max-width: 100%;
+    word-wrap: break-word;
+    overflow: hidden;
+    font-family: Arial, Helvetica, sans-serif;
+}
+.content .smallt {
+    font-size: smaller;
+}
+
+.ccontent {
+    background-color: snow;
+    border: solid 10px rgb(44, 79, 114);
+    border-radius: 25px;
+    box-shadow: 20px 20px 50px 15px silver inset;
+    padding: 20px;
+    margin-top: 20px;
+    font-family: Arial, Helvetica, sans-serif;
+    text-align: left;
+    padding-left: 20px;
+}
+.ccontent .namef {
+    border: solid 2px rgb(44, 79, 114);
+    border-radius: 5px;
+    margin-bottom: 5px;
+    margin-left: 5px;
+}
+.ccontent .titlef {
+    border: solid 2px rgb(44, 79, 114);
+    border-radius: 5px;
+    margin-bottom: 5px;
+}
+.ccontent .postB {
+    border: solid 2px rgb(44, 79, 114);
+    border-radius: 5px;
+    margin-bottom: 5px;
+    margin-left: 5px;
+    background-color: snow;
+}
+.ccontent .postB:hover {
+    background-color: rgb(44, 79, 114);
+    border: solid silver;
+    transition-duration: 1s;
+    color: snow;
+}
+.content .editf {
+    border: none;
+}
+.content .scB {
+    background-color: snow;
+    border: silver solid 2px;
+    padding: 5px;
+    border-radius: 5px;
+    height: 50px;
+    width: 100px;
+    margin-top: 10px;
+}
+.content .scB:hover {
+    background-color: rgb(44, 79, 114);
+    transition-duration: 1s;
+}
+.content .editT {
+    border: silver solid 10px;
+    border-radius: 10px;
+    margin-top: 10px;
+}
+.content .editN {
+    border: silver solid 10px;
+    border-radius: 10px;
+    margin-top: 10px;
+}
+.content .editC {
+    border: silver solid 10px;
+    border-radius: 10px;
+    margin-top: 10px;
+}
+.content .editt {
+    border: solid 2px rgb(44, 79, 114);
+    border-radius: 5px;
+    margin-bottom: 5px;
+}
+.content .editn {
+    border: solid 2px rgb(44, 79, 114);
+    border-radius: 5px;
+    margin-bottom: 5px;
+}
+.content .editc {
+    border: solid 2px rgb(44, 79, 114);
+    border-radius: 5px;
+    margin-bottom: 5px;
+}
+.bottom {
+    border: solid 5px rgb(44, 79, 114);
+    background-color: snow;
+    border-radius: 25px;
+    box-shadow: 20px 20px 50px 15px silver inset;
+    text-shadow: 1px 1px 4px rgb(44, 79, 114);
+    padding: 20px;
+    margin-top: 20px;
+    font-family: Arial, Helvetica, sans-serif;
+    text-align: center;
+    font-size: larger;
+}
+.ccontent h1 {
+    text-align: center;
+}
