@@ -1,0 +1,11 @@
+.blogPosts {
+   display: flex;
+   justify-content: center;
+   align-items: center;
+}
+
+.title {
+   display: flex;
+   justify-content: center;
+   align-items: center;
+}
